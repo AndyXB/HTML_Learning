@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Game</title>
+	<style>
+		body {
+			text-align: center;
+		}
+		canvas {
+			border: 1px solid orange;
+		}
+	</style>
+	<script src="http://cdn.gbtags.com/EaselJS/0.7.1/easeljs.min.js"></script>
+</head>
+<body>
+	<canvas id="myCanvas" width="350" height="420"></canvas>
+	<script>
+		var canvas = document.getElementById('myCanvas'),
+			stage = new createjs.Stage(canvas);
+
+		var stageWidth = canvas.width;
+		var stageHeight = canvas.height;
+		var characterWidth = 75;
+		var characterHeight = 96;
+
+		var spritesheet, character;
+
+		var shape;
+		// var drawMap = true;
+
+		window.onload = function() {
+
+			//鼠标移动路径
+			shape = new createjs.Shape();
+			//设置路径宽度为1，颜色为红色
+			shape.graphics.setStrokeStyle(1).beginStroke("red");
+			stage.addChild(shape);
+
+			//动画角色
+			spritesheet = new createjs.SpriteSheet({
+				'images': ['http://cdn.gbtags.com/gblibraryassets/libid108/charactor.png'],
+				'frames': {"height": characterHeight, "count": 10, "width": characterWidth}
+			});
+
+			character = new createjs.Sprite(spritesheet);
+			character.x = (stageWidth - characterWidth) / 2;
+			character.y = (stageHeight - characterHeight) / 2;
+
+			stage.addChild(character);
+
+			character.play();
+
+			createjs.Ticker.setFPS(35);
+			createjs.Ticker.addEventListener('tick', tick);
+
+			// stage.addEventListener('mousedown', clickStage);
+
+			// function clickStage () {
+			// 	 if (drawMap) {
+			// 	  	stage.removeChild(shape);
+			// 	  	drawMap = false;
+			// 	  } else {
+			// 	  	stage.addChild(shape);
+			// 	  	drawMap = true;
+			// 	  } 
+			// }
+
+			function tick () {
+				//动态绘制鼠标路径
+				shape.graphics.lineTo(stage.mouseX, stage.mouseY);
+
+				//让角色跟随鼠标移动
+				//character.x = stage.mouseX - characterWidth / 2;
+				//character.y = stage.mouseY - characterHeight / 2;
+
+				//上方效果太过僵硬，这里使用缓冲效果来实现角色的移动
+				character.x += (stage.mouseX - character.x - characterWidth / 2) * 0.1;
+				character.y += (stage.mouseY - character.y - characterHeight / 2) * 0.1;
+
+				//设置角色中心到达鼠标位置时停止动画
+				if (Math.abs(stage.mouseX - character.x - characterWidth / 2) < 1 && Math.abs(stage.mouseY - character.y - characterHeight / 2) < 1) {
+
+					//让动画停在第一帧
+					character.gotoAndStop(0);
+					
+				} else {
+
+					character.play();
+					
+				}
+
+				stage.update(); 
+			}
+
+		}
+
+	</script>
+</body>
+</html>
